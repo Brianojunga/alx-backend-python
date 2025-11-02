@@ -1,0 +1,1 @@
+I set up Set up the MySQL database, ALX_prodev with the table user_data with the following fields and populated with https://savanna.alxafrica.com/rltoken/kPrtJ_hN0TXKgEfwKY4vHg
