@@ -22,3 +22,8 @@ class ExecuteQuery:
             self.connection.commit()
         self.cursor.close()
         self.connection.close()
+
+# Example executation
+with ExecuteQuery('example.db', 'SELECT * FROM users WHERE age > ?', 25) as results:
+    for row in results:
+        print(row)
