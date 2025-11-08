@@ -1,5 +1,6 @@
 import sqlite3
 import functools
+from datetime import datetime
 
 #### decorator to log SQL queries
 
@@ -11,7 +12,7 @@ def log_queries(func):
        print(f"Executing query: {query}")
        try:
           result = func(*args, **kwargs)
-          print(f"Query executed successfully. Rows returned: {len(result)}")
+          print(f"Query executed successfully. Rows returned: {len(result), {datetime.now()}}")
           return result
        except Exception as e:
           print(f"Error executing query: {e}")
