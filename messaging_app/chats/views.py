@@ -16,7 +16,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         serializer.save(sender_id=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class ConversationViewset(viewsets.ModelViewSet):
+class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
 
