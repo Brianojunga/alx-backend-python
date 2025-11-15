@@ -22,7 +22,7 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def validate_message_body(self, value):
         if len(value) < 10:
-            raise serializers.validationError('Message body should not be less than 10 characters')
+            raise serializers.ValidationError('Message body should not be less than 10 characters')
         return value
 
 class ConversationSerializer(serializers.ModelSerializer):
