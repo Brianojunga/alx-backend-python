@@ -19,9 +19,17 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def get_sender_full_name(self, obj):
         return f"{obj.sender_id.first_name} {obj.sender_id.last_name}"
+    
+    def validate_message_body(self, value):
+        if len(value) < 10:
+            raise serializers.validationError('Message body should not be less than 10 characters')
+        return value
 
 class ConversationSerializer(serializers.ModelSerializer):
     participants_id = UserSerializer(read_only = True)
+
+    # Example CharField for temporary notes
+    conversation_note = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
     class Meta:
         model = Conversation
