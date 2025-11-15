@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, status, filter
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
@@ -21,5 +21,5 @@ class ConversationViewset(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
 
     # Optional: add filtering by participants
-    filter_backends = [filter.SearchFilter]
+    filter_backends = [filters.SearchFilter]
     search_fields = ['participants_id__first_name', 'participants_id__last_name']
