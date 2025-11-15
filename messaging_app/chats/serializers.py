@@ -11,10 +11,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_id = UserSerializer(read_only = True)
+    sender_full_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = ['message_id', 'sender_id', 'message_body', 'sent_at']
+    
+    def get_sender_full_name(self, obj):
+        return f"{obj.sender_id.first_name} {obj.sender_id.last_name}"
 
 class ConversationSerializer(serializers.ModelSerializer):
     participants_id = UserSerializer(read_only = True)
