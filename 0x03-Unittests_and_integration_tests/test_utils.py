@@ -45,7 +45,7 @@ class TestGetJson(unittest.TestCase):
         ("http://holberton.io", {"payload": False}),
     ])
     def test_get_json(self, test_url, test_payload):
-        """Test that get_json returns expected payload without real HTTP requests."""
+        """Test get_json returns expected payload without real requests."""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
 
@@ -61,7 +61,7 @@ class TestMemoize(unittest.TestCase):
     """Test cases for the memoize decorator."""
 
     def test_memoize(self):
-        """Test that memoize caches the result and calls the method only once."""
+        """Test memoize caches the result, calls the method only once."""
 
         class TestClass:
             def a_method(self):
