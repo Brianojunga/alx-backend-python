@@ -31,16 +31,20 @@ class TestGithubOrgClient(unittest.TestCase):
             "repos_url": "https://api.github.com/orgs/google/repos"
         }
 
-        # Patch the 'org' property with PropertyMock
+        # Patch the 'org' property (which is memoized)
         with patch(
             "client.GithubOrgClient.org",
-            new_callable=PropertyMock
+            new_callable=PropertyMock,
+            return_value=mock_payload
         ) as mock_org:
-            mock_org.return_value = mock_payload
             client = GithubOrgClient("google")
             result = client._public_repos_url
 
-        assert result == mock_payload["repos_url"]
+            # Verify the result
+            self.assertEqual(result, mock_payload["repos_url"])
+            
+            # Verify org was accessed
+            mock_org.assert_called_once()
 
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
