@@ -90,9 +90,7 @@ class TestMemoize(unittest.TestCase):
 
 @parameterized_class(
     ("org_payload", "repos_payload", "expected_repos", "apache2_repos"),
-    [
-        (org_payload, repos_payload, expected_repos, apache2_repos)
-    ]
+    [(org_payload, repos_payload, expected_repos, apache2_repos)]
 )
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos"""
@@ -100,7 +98,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Start patching requests.get for integration tests"""
-        cls.get_patcher = patch("client.requests.get")
+        # Patch requests.get where it's used (in the client module)
+        cls.get_patcher = patch("requests.get")
         cls.mock_get = cls.get_patcher.start()
 
         # Mock side_effect for requests.get(url).json()
