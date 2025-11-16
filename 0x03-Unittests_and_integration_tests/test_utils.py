@@ -11,6 +11,7 @@ from utils import access_nested_map, get_json, memoize
 import client
 from client import GithubOrgClient
 from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
+import requests
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -98,11 +99,9 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Start patching requests.get for integration tests"""
-        # Patch requests.get where it's used (in the client module)
-        cls.get_patcher = patch("requests.get")
+        cls.get_patcher = patch("client.requests.get")
         cls.mock_get = cls.get_patcher.start()
 
-        # Mock side_effect for requests.get(url).json()
         def side_effect(url, *args, **kwargs):
             mock_response = Mock()
             if url.endswith("/repos"):
@@ -118,10 +117,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """Stop patching requests.get"""
         cls.get_patcher.stop()
 
-    def test_public_repos(self):
-        """Test public_repos returns the expected repos list"""
-        gh_client = GithubOrgClient(self.org_payload["login"])
-        self.assertEqual(gh_client.public_repos(), self.expected_repos)
+        def test_public_repos(self):
+            """Test public_repos returns the expected repos list"""
+            gh_client = GithubOrgClient(self.org_payload["login"])
+            self.assertEqual(gh_client.public_repos(), self.expected_repos)
 
     def test_public_repos_with_license(self):
         """Test public_repos filtering by license"""
