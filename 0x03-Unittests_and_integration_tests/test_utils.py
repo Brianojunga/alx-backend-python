@@ -10,7 +10,7 @@ from parameterized import parameterized, parameterized_class
 from utils import access_nested_map, get_json, memoize
 import client
 from client import GithubOrgClient
-from fixtures import TEST_PAYLOAD
+from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -90,7 +90,7 @@ class TestMemoize(unittest.TestCase):
 
 @parameterized_class(
     ("org_payload", "repos_payload", "expected_repos", "apache2_repos"),
-    TEST_PAYLOAD
+    [(org_payload, repos_payload, expected_repos, apache2_repos)]
 )
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos"""
