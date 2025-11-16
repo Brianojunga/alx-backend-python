@@ -41,32 +41,26 @@ class TestGithubOrgClient(unittest.TestCase):
     
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
-        """Test GithubOrgClient.public_repos"""
-
-        # Mock payload returned by get_json (repos_payload)
-        mock_payload = [
+        """Test public_repos"""
+        mock_repos = [
             {"name": "repo1"},
             {"name": "repo2"},
             {"name": "repo3"},
         ]
-        mock_get_json.return_value = mock_payload
+        mock_get_json.return_value = mock_repos
 
-        # Mocked URL for _public_repos_url
-        mock_url = "https://api.github.com/orgs/testorg/repos"
-
-        with patch("client.GithubOrgClient._public_repos_url", new_callable=property, return_value=mock_url):
+        with patch("client.GithubOrgClient._public_repos_url",
+                   return_value="https://api.github.com/orgs/testorg/repos"):
             client = GithubOrgClient("testorg")
             result = client.public_repos()
 
-            # Expected repo names from the mock payload
-            expected = ["repo1", "repo2", "repo3"]
+        # Expected repo names
+        expected = ["repo1", "repo2", "repo3"]
+        self.assertEqual(result, expected)
 
-            self.assertEqual(result, expected)
+        # get_json must be called once with the mocked URL
+        mock_get_json.assert_called_once_with("https://api.github.com/orgs/testorg/repos")
 
-            # Assert _public_repos_url was accessed exactly once
-            # (By calling repos_payload -> get_json)
-            # get_json must have been called once with mock_url
-            mock_get_json.assert_called_once_with(mock_url)
 
 
 
