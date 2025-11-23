@@ -93,3 +93,38 @@ class RestrictAccessByTimeMiddleware:
 
         response = self.get_response(request)
         return response
+    
+
+class RolePermissionMiddleware:
+    """
+    Middleware to restrict access to certain actions based on user role.
+    Only 'admin' or 'moderator' users are allowed.
+    """
+
+    ALLOWED_ROLES = ["admin", "moderator"]
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user = request.user
+
+        # Only check authenticated users
+        if user.is_authenticated:
+            user_role = getattr(user, "role", None)
+
+            # Deny access if role is not allowed
+            if user_role not in self.ALLOWED_ROLES:
+                return JsonResponse(
+                    {"error": "Forbidden: You do not have permission to perform this action."},
+                    status=403
+                )
+        else:
+            # Deny access for unauthenticated users
+            return JsonResponse(
+                {"error": "Authentication required."},
+                status=401
+            )
+
+        response = self.get_response(request)
+        return response
