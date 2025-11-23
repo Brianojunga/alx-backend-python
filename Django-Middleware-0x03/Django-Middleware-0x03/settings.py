@@ -44,7 +44,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "chats.middleware.OffensiveLanguageMiddleware",
-    "chats.middleware.RequestLoggingMiddleware",
+    "chats.middleware.OffensiveLanguageMiddleware",
+    "chats.middleware.RestrictAccessByTimeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

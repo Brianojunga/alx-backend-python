@@ -1,5 +1,6 @@
 # messaging_app/middleware.py
 from datetime import datetime
+from django.http import JsonResponse
 
 class RequestLoggingMiddleware:
     def __init__(self, get_response):
@@ -19,9 +20,6 @@ class RequestLoggingMiddleware:
         return response
 
 
-# chats/middleware.py
-from datetime import datetime, timedelta
-from django.http import JsonResponse
 
 class OffensiveLanguageMiddleware:
     """
@@ -71,3 +69,27 @@ class OffensiveLanguageMiddleware:
         else:
             ip = request.META.get("REMOTE_ADDR")
         return ip
+
+
+class RestrictAccessByTimeMiddleware:
+    """
+    Middleware to restrict access to the messaging app outside
+    6:00 AM - 9:00 PM.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        now = datetime.now()
+        current_hour = now.hour  # 0-23
+
+        # Allow access only between 6 AM and 9 PM
+        if current_hour < 6 or current_hour >= 21:
+            return JsonResponse(
+                {"error": "Messaging app is closed. Access allowed only from 6AM to 9PM."},
+                status=403
+            )
+
+        response = self.get_response(request)
+        return response
