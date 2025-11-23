@@ -4,13 +4,15 @@ from rest_framework.response import Response
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
 from .permissions import IsConversationParticipant, IsMessageSender, IsParticipantOfConversation
-
+from .pagination import MessagePagination
+from .filters import MessageFilter
 
 # Create your views here.
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsConversationParticipant, IsMessageSender]
+    pagination_class = MessagePagination
 
     # Example: override create to automatically set sender
     def create(self, request, *args, **kwargs):
@@ -41,6 +43,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     # Optional: add filtering by participants
     filter_backends = [filters.SearchFilter]
     search_fields = ['participants_id__first_name', 'participants_id__last_name']
+    filterset_class = MessageFilter
 
     def get_queryset(self):
         return Conversation.objects.filter(participants_id = self.request.user)
