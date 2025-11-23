@@ -3,7 +3,7 @@ from rest_framework import viewsets, status, filters, permissions
 from rest_framework.response import Response
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
-from .permissions import IsConversationParticipant, IsMessageSender
+from .permissions import IsConversationParticipant, IsMessageSender, IsParticipantOfConversation
 
 
 # Create your views here.
@@ -18,12 +18,26 @@ class MessageViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(sender_id=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def get_queryset(self):
+        conversation_id = self.request.query_params.get('conversation_id')
+        if conversation_id:
+            return Message.objects.filter(
+                conversation_id = conversation_id
+            )
+        return Message.objects.none()
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [permissions.IsAuthenticated, IsConversationParticipant]
+    permission_classes = [permissions.IsAuthenticated, IsConversationParticipant, IsParticipantOfConversation]
 
     # Optional: add filtering by participants
     filter_backends = [filters.SearchFilter]
     search_fields = ['participants_id__first_name', 'participants_id__last_name']
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants_id = self.request.user)
+        
+    def perfom_create(self, serializer):
+        serializer.save(participants_id = self.request.user)
