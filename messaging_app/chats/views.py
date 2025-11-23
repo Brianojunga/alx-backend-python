@@ -27,7 +27,7 @@ class MessageViewSet(viewsets.ModelViewSet):
             )
         return Message.objects.none()
     
-     def perform_create(self, serializer):
+    def perform_create(self, serializer):
         conversation = serializer.validated_data.get('conversation')
         if self.request.user != conversation.participants_id:
             return Response({"detail": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
