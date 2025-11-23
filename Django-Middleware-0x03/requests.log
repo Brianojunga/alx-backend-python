@@ -1,0 +1,2 @@
+ls -l requests.log
+cat requests.log
