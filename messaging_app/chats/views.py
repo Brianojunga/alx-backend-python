@@ -6,6 +6,10 @@ from .serializers import MessageSerializer, ConversationSerializer
 from .permissions import IsConversationParticipant, IsMessageSender, IsParticipantOfConversation
 from .pagination import MessagePagination
 from .filters import MessageFilter
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create your views here.
 class MessageViewSet(viewsets.ModelViewSet):
@@ -16,24 +20,26 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     # Example: override create to automatically set sender
     def create(self, request, *args, **kwargs):
+        sender_id = request.user
+        conversation_id = self.kwargs['conversation_id']
+        conversation = get_object_or_404(Conversation, pk=conversation_id)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(sender_id=request.user)
+        serializer.save(
+            sender_id = sender_id,
+            conversation = conversation,
+        )
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     
     def get_queryset(self):
-        conversation_id = self.request.query_params.get('conversation_id')
-        if conversation_id:
-            return Message.objects.filter(
-                conversation_id = conversation_id
+        return Message.objects.filter(
+                conversation = self.kwargs['conversation_id']
             )
-        return Message.objects.none()
     
-    def perform_create(self, serializer):
-        conversation = serializer.validated_data.get('conversation')
-        if self.request.user != conversation.participants_id:
-            return Response({"detail": "Not allowed"}, status=status.HTTP_403_FORBIDDEN)
-        serializer.save(sender_id=self.request.user)
+    
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
