@@ -38,6 +38,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.sender_id} : {self.message_body}'
-
-    def __str__(self):
-        return f'{self.participants_id}'
