@@ -1,11 +1,9 @@
 from django.urls import path, include
 from rest_framework import routers
-# from rest_framework_nested import routers
 from .views import MessageViewSet, ConversationViewSet
 
 
 router = routers.DefaultRouter()
-router.register(r'messages', MessageViewSet)
 router.register(r'conversation', ConversationViewSet)
 
 # conversation_router = routers.NestedDefaultRouter(router, r'conversations', lookup='conversation')
@@ -13,5 +11,17 @@ router.register(r'conversation', ConversationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    # path('', include(conversation_router.urls))
+    path('conversations/<uuid:conversation_id>/messages/', 
+         MessageViewSet.as_view({ 
+        'post': 'create',
+        'get': 'list'
+    })),
+    path('conversations/<uuid:conversation_id>/messages/<int:pk>/', 
+        MessageViewSet.as_view({      
+            'put': 'update',        
+            'patch': 'partial_update',  
+            'delete': 'destroy'
+        }), 
+        name='conversation-message-detail'
+    ),
 ]
