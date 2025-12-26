@@ -8,6 +8,7 @@ from .pagination import MessagePagination
 from .filters import MessageFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -51,8 +52,34 @@ class ConversationViewSet(viewsets.ModelViewSet):
     search_fields = ['participants_id__first_name', 'participants_id__last_name']
     filterset_class = MessageFilter
 
-    def get_queryset(self):
-        return Conversation.objects.filter(participants_id = self.request.user)
+    def create(self, request, *args, **kwargs):
+        host = request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        participants = serializer.validated_data['participants_id']
+
+        conversation = Conversation.objects.filter(
+            Q(host_id = host, participants_id = participants)
+            | Q(participants_id = host, host_id= participants )     
+            ).first()
         
-    def perfom_create(self, serializer):
-        serializer.save(participants_id = self.request.user)
+        if conversation:  
+            return Response(
+                serializer.data, 
+                status=status.HTTP_200_OK
+            )
+
+        serializer.save(host_id = host_id)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Conversation.objects.all()
+        
+        return Conversation.objects.filter( 
+            Q(host_id = user ) 
+            | Q(participants_id = user)
+        )
+        
