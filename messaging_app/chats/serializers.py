@@ -15,7 +15,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['message_id', 'sender_id', 'message_body', 'sent_at']
+        fields = ['message_id', 'sender_id', 'message_body', 'sent_at', 'conversation']
+        read_only_fields = ['message_id', 'sender_id', 'sent_at', 'conversation_id']
     
     def get_sender_full_name(self, obj):
         return f"{obj.sender_id.first_name} {obj.sender_id.last_name}"
@@ -27,10 +28,13 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ConversationSerializer(serializers.ModelSerializer):
     participants_id = UserSerializer(read_only = True)
+    host_id = UserSerializer(read_only=True)
+    messages = MessageSerializer(many=True, read_only=True)
 
     # Example CharField for temporary notes
     conversation_note = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
     class Meta:
         model = Conversation
-        fields = ['conversation_id', 'participants_id', 'created_at']
+        fields = ['conversation_id', 'participants_id', 'created_at', 'host_id', 'messages']
+        read_only_fields=['conversion_id', 'host_id', 'participants_id']
